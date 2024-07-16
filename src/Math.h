@@ -38,8 +38,9 @@ normalize(v3 v) {
 
 v3
 rotateXY(v3 v, f64 r) {
-  v3 w = {v.x * cos(r) - v.y * cos(r),v.y * cos(r) + v.x * sin(r), v.z};
+  v3 w = {v.x * cos(r) - v.y * sin(r),v.y * cos(r) + v.x * sin(r), v.z};
   return w;
+  return normalize(w);
 }
 
 v3
@@ -49,6 +50,7 @@ rotateUP(v3 v, f64 r) {
   f64 k = newxy / xy;
   v3 w = {k * v.x, k * v.y, xy * sin(r) + v.z * cos(r)};
   return w;
+  return normalize(w);
 }
 
 crd*

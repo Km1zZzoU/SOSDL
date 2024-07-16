@@ -17,15 +17,117 @@
 #include "Math.h"
 
 int main() {
-  Ray signt = {{0, 0, 10}, {3, 2, -10}};
-  Map_Rectangle rect = {{1, 1, 0}, 10, 10, 2};
-  Map map = {{1, &rect}};
+  Ray cam = {{0, 0, 2}, {1, 1, -1}};
+  Map_Rectangle rect = {{1, 1, 0}, 1, 1, 1};
   /*
   crd* a = shoot_Rect(&rect, signt);
    */
+  Map map = {{1, &rect}};
   gir = initialize_window();
+  
+  int wasdshsp[6] = {0, 0, 0, 0, 0, 0};
+  int rot[4] = {0, 0, 0, 0};
+  
   while (gir) {
-    render(signt, &map);
+    render(cam, &map);
+    printf("%.1lf, %.1lf, %.1lf\n", cam.pos.x, cam.pos.y, cam.pos.z);
+
+    SDL_Event ev;
+    while (SDL_PollEvent(&ev)) {
+      switch (ev.type) {
+        case SDL_KEYDOWN:
+          switch (ev.key.keysym.sym) {
+            continue;
+          }
+        case SDL_KEYUP:
+          switch (ev.key.keysym.sym) {
+            case 'w':
+              wasdshsp[0] = ev.type == SDL_KEYDOWN;
+              break;
+            case 'a':
+              wasdshsp[1] = ev.type == SDL_KEYDOWN;
+              break;
+            case 's':
+              wasdshsp[2] = ev.type == SDL_KEYDOWN;
+              break;
+            case 'd':
+              wasdshsp[3] = ev.type == SDL_KEYDOWN;
+              break;
+            case 'q':
+              wasdshsp[4] = ev.type == SDL_KEYDOWN;
+              break;
+            case 'e':
+              wasdshsp[5] = ev.type == SDL_KEYDOWN;
+              break;
+
+            case SDLK_ESCAPE:
+              gir = 0;
+              break;
+
+            case SDLK_UP:
+              rot[0] = ev.type == SDL_KEYDOWN;
+              break;
+            case SDLK_LEFT:
+              rot[1] = ev.type == SDL_KEYDOWN;
+              break;
+            case SDLK_DOWN:
+              rot[2] = ev.type == SDL_KEYDOWN;
+              break;
+            case SDLK_RIGHT:
+              rot[3] = ev.type == SDL_KEYDOWN;
+              break;
+            default:
+              break;
+          }
+          break;
+        case SDL_QUIT:
+          gir = 0;
+          break;
+      }
+    }
+
+    point teorpos = {cam.pos.x, cam.pos.y, cam.pos.z};
+
+    if (wasdshsp[0]) {
+      teorpos.x += cam.dir.x * movespeed * 1.2;
+      teorpos.y += cam.dir.y * movespeed * 1.2;
+      teorpos.z += cam.dir.z * movespeed * 1.2;
+    }
+
+    if (wasdshsp[1]) {
+      teorpos.x += rotateXY(cam.dir, -pi / 2).x * movespeed;
+      teorpos.y += rotateXY(cam.dir, -pi / 2).y * movespeed;
+    }
+
+    if (wasdshsp[2]) {
+      teorpos.x -= cam.dir.x * movespeed * 1.2;
+      teorpos.y -= cam.dir.y * movespeed * 1.2;
+      teorpos.z -= cam.dir.z * movespeed * 1.2;
+    }
+
+    if (wasdshsp[3]) {
+      teorpos.x += rotateXY(cam.dir, pi / 2).x * movespeed;
+      teorpos.y += rotateXY(cam.dir, pi / 2).y * movespeed;
+    }
+
+    if (rot[0]) {
+      cam.dir = rotateUP(cam.dir, rotatespeed);
+    }
+
+    if (rot[1]) {
+      cam.dir = rotateXY(cam.dir, -rotatespeed);
+    }
+
+    if (rot[2]) {
+      cam.dir = rotateUP(cam.dir, -rotatespeed);
+    }
+
+    if (rot[3]) {
+      cam.dir = rotateXY(cam.dir, rotatespeed);
+    }
+
+    cam.pos = teorpos;
+
     SDL_Delay(10);
   }
   return 0;

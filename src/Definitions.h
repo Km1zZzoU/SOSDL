@@ -38,7 +38,7 @@ typedef struct {
 } v3;
 
 typedef struct {
-  point_i pos;
+  point pos;
   v3  dir;
 } Ray;
 
