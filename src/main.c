@@ -13,14 +13,16 @@
 #include <ctype.h>
 #include <unistd.h>
 
+double globl = 1.5;
 #include "Render.h"
 #include "Math.h"
 
+
 int main() {
-  Ray cam = {{1, 1, 2}, {1, 1, -1}};
-  Map_Rectangle rect = {{1, 1, 0}, 1, 1, 1};
+  Ray cam = {{1, -10, 13}, {0, 1, -1}};
+  Map_Rectangle rect = {{0, 1, 0}, 10, 10, 10};
   /*
-  crd* a = shoot_Rect(&rect, cam);
+  crd a = shoot_Rect(&rect, cam);
    */
   Map map = {{1, &rect}};
   gir = initialize_window();
@@ -38,6 +40,12 @@ int main() {
       switch (ev.type) {
         case SDL_KEYDOWN:
           switch (ev.key.keysym.sym) {
+            case 'c':
+              globl += 0.1;
+              break;
+            case 'x':
+              globl -= 0.1;
+              break;
           }
         case SDL_KEYUP:
           switch (ev.key.keysym.sym) {
@@ -119,7 +127,7 @@ int main() {
     }
 
     if (rot[0]) {
-      cam.dir = rotateUP(cam.dir, rotatespeed);
+      cam.dir = rotateUP(cam.dir, -rotatespeed);
     }
 
     if (rot[1]) {
@@ -127,7 +135,7 @@ int main() {
     }
 
     if (rot[2]) {
-      cam.dir = rotateUP(cam.dir, -rotatespeed);
+      cam.dir = rotateUP(cam.dir, rotatespeed);
     }
 
     if (rot[3]) {
@@ -138,7 +146,7 @@ int main() {
 
     clock_t t = clock();
     f64 seconds = (f64)(t - t0) / CLOCKS_PER_SEC;
-    printf("%.15lf\n", 1.0 / seconds);
+    printf(" %.2lf %.15lf\n", globl, 1.0 / seconds);
   }
   return 0;
 }

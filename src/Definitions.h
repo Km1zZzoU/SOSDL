@@ -17,7 +17,7 @@ typedef struct {
 
 typedef struct {
   point p;
-  f64    dist;
+  f64   dist;
 } crd;
 
 typedef struct {
@@ -26,7 +26,7 @@ typedef struct {
 
 typedef struct {
   point_i p;
-  f64      dist;
+  f64     dist;
 } crd_i;
 
 typedef struct {

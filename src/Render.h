@@ -19,31 +19,32 @@ render(Ray sight, Map* map) {
   for (u16 i = 0; i < W_win; ++i) {
     Ray shoot = {startshoot.pos, rotateXY(startshoot.dir, (i - W_win / 2.0) * vapp)};
 
+    //clock_t t0 = clock();
     for (u16 j = 0; j < H_win; ++j) {
-      shoot.dir = rotateUP(shoot.dir, -vapp);
+      shoot.dir = rotateUP(shoot.dir, -vapp *pow(cos((i - W_win / 2.0) * (j - H_win / 2.0) * vapp / 250), 3));
 
-      crd* poi;
+      crd poi = {{0, 0, 0}, 0};
       for (u16 k = 0; k < map->rects.count; ++k) {
-        //clock_t t0 = clock();
-        crd* testpoi = shoot_Rect(map->rects.Rectangles + k, shoot);
+        crd testpoi = shoot_Rect(map->rects.Rectangles + k, shoot);
         /*
-        clock_t t = clock();
-        f64 seconds = (f64)(t - t0) / CLOCKS_PER_SEC;
-        printf("%.15lf\n", seconds);
          */
-        //poi = near(poi, testpoi);
+        //poi = *near(&poi, testpoi);
+        //poi = *near(&poi, testpoi);
         poi = testpoi;
       }
 
-      if (poi) {
+      if (poi.dist > q) {
+        //printf("%.10lf\n", poi.dist);
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderDrawPoint(renderer, i, j);
       }
-      /*
-      if ((i == 0 || i == W_win - 1) && (j == 0 || j == H_win - 1))
-        printf("(%.3lf, %.3lf, %.3lf)\n", shoot.dir.x, shoot.dir.y, shoot.dir.z);
-      */
     }
+
+    /*
+    clock_t t = clock();
+    f64 seconds = (f64)(t - t0) / CLOCKS_PER_SEC;
+    printf("%.15lf\n", seconds);
+  */
   }
   SDL_RenderPresent(renderer);
 }

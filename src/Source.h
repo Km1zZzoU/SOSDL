@@ -10,12 +10,12 @@ bool gir = false; // game is running
 SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
 
-#define W_win 860
-#define H_win 540
+#define W_win 800
+#define H_win 450
 #define pi 3.1415926535897932384626433832795028841971
 f64 FOV_h = (80.0 / 180 * pi);
 #define FOV_v = (FOV_h * (H_win / W_win));
-#define movespeed 1
+#define movespeed 0.5
 #define rotatespeed 0.1
 
 
