@@ -53,44 +53,32 @@ rotateUP(v3 v, f64 r) {
   return normalize(w);
 }
 
-crd*
-shoot_Side(int maincord,
+void
+shoot_Side(crd* coord, int maincord,
                 int cord1, int cord2, int l1, int l2,
                 f64 dirx, f64 diry, f64 dirz,
                 f64 posx, f64 posy, f64 posz) {
   if (!dirx)
-    return 0;
+    return;
 
   f64 len = (maincord - posx) / dirx;
   if (len < 0)
-    return 0;
+    return;
 
-  crd* coord = (crd*) malloc(sizeof (crd));
-  coord->p = (point*) malloc(sizeof (point));
-  coord->p->y = diry * len + posy;
-  if (coord->p->y < cord1 || coord->p->y > cord1 + l1)
-    return 0;
-  coord->p->z = dirz * len + posz;
-  if (coord->p->z < cord2 || coord->p->z > cord2 + l2)
-    return 0;
-  coord->p->x = maincord;
+  point p1 = {maincord, diry * len + posy, dirz * len + posz};
+  if (p1.y < cord1 || p1.y > cord1 + l1)
+    return;
+  if (p1.z < cord2 || p1.z > cord2 + l2)
+    return;
   point p2 = {posx, posy, posz};
-  coord->dist = dist(*coord->p, p2);
-  return coord;
+  coord->p = p1;
+  coord->dist = dist(p1, p2);
 }
 
 crd*
 near(crd* coord, crd* tmp) {
-  if (coord == 0 || (tmp != 0 && coord->dist > tmp->dist)) {
-    if (coord) {
-      free(coord->p);
-      free(coord);
-    }
+  if (tmp != 0 && (coord == 0 || (coord->dist > tmp->dist)) && tmp->dist > 0) {
     return tmp;
-  }
-  if (tmp) {
-    free(tmp->p);
-    free(tmp);
   }
   return coord;
 }
@@ -98,41 +86,49 @@ near(crd* coord, crd* tmp) {
 crd*
 shoot_Rect(Map_Rectangle* rect, Ray ray) {
 
-  crd* coord = shoot_Side(rect->pos.x,
-                          rect->pos.y, rect->pos.z, rect->y, rect->z,
-                          ray.dir.x, ray.dir.y, ray.dir.z,
-                          ray.pos.x, ray.pos.y, ray.pos.z);
-  //coord = near(coord, tmp);
-
-  crd* tmp = shoot_Side(rect->pos.x + rect->x,
-                        rect->pos.y, rect->pos.z, rect->y, rect->z,
-                        ray.dir.x, ray.dir.y, ray.dir.z,
-                        ray.pos.x, ray.pos.y, ray.pos.z);
+  crd* coord = 0;
+  crd* tmp = (crd*) malloc(sizeof (crd));
+  shoot_Side(tmp, rect->pos.x,
+             rect->pos.y, rect->pos.z, rect->y, rect->z,
+             ray.dir.x, ray.dir.y, ray.dir.z,
+             ray.pos.x, ray.pos.y, ray.pos.z);
   coord = near(coord, tmp);
+  tmp->dist = 0;
 
-  tmp = shoot_Side(rect->pos.y,
-                   rect->pos.x, rect->pos.z, rect->x, rect->z,
-                   ray.dir.y, ray.dir.x, ray.dir.z,
-                   ray.pos.y, ray.pos.x, ray.pos.z);
+  shoot_Side(tmp, rect->pos.x + rect->x,
+             rect->pos.y, rect->pos.z, rect->y, rect->z,
+             ray.dir.x, ray.dir.y, ray.dir.z,
+             ray.pos.x, ray.pos.y, ray.pos.z);
   coord = near(coord, tmp);
+  tmp->dist = 0;
 
-  tmp = shoot_Side(rect->pos.y + rect->y,
-                   rect->pos.x, rect->pos.z, rect->x, rect->z,
-                   ray.dir.y, ray.dir.x, ray.dir.z,
-                   ray.pos.y, ray.pos.x, ray.pos.z);
+  shoot_Side(tmp, rect->pos.y,
+             rect->pos.x, rect->pos.z, rect->x, rect->z,
+             ray.dir.y, ray.dir.x, ray.dir.z,
+             ray.pos.y, ray.pos.x, ray.pos.z);
   coord = near(coord, tmp);
+  tmp->dist = 0;
 
-  tmp = shoot_Side(rect->pos.z,
-                   rect->pos.y, rect->pos.x, rect->y, rect->x,
-                   ray.dir.z, ray.dir.y, ray.dir.x,
-                   ray.pos.z, ray.pos.y, ray.pos.x);
+  shoot_Side(tmp, rect->pos.y + rect->y,
+             rect->pos.x, rect->pos.z, rect->x, rect->z,
+             ray.dir.y, ray.dir.x, ray.dir.z,
+             ray.pos.y, ray.pos.x, ray.pos.z);
   coord = near(coord, tmp);
+  tmp->dist = 0;
 
-  tmp = shoot_Side(rect->pos.z + rect->z,
-                   rect->pos.y, rect->pos.x, rect->y, rect->x,
-                   ray.dir.z, ray.dir.y, ray.dir.x,
-                   ray.pos.z, ray.pos.y, ray.pos.x);
+  shoot_Side(tmp, rect->pos.z,
+             rect->pos.y, rect->pos.x, rect->y, rect->x,
+             ray.dir.z, ray.dir.y, ray.dir.x,
+             ray.pos.z, ray.pos.y, ray.pos.x);
   coord = near(coord, tmp);
+  tmp->dist = 0;
 
+  shoot_Side(tmp, rect->pos.z + rect->z,
+             rect->pos.y, rect->pos.x, rect->y, rect->x,
+             ray.dir.z, ray.dir.y, ray.dir.x,
+             ray.pos.z, ray.pos.y, ray.pos.x);
+  coord = near(coord, tmp);
+/*
+*/
   return coord;
 }

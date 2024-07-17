@@ -16,7 +16,7 @@ typedef struct {
 } point;
 
 typedef struct {
-  point* p;
+  point p;
   f64    dist;
 } crd;
 
@@ -25,7 +25,7 @@ typedef struct {
 } point_i;
 
 typedef struct {
-  point_i* p;
+  point_i p;
   f64      dist;
 } crd_i;
 

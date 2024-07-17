@@ -17,27 +17,27 @@
 #include "Math.h"
 
 int main() {
-  Ray cam = {{0, 0, 2}, {1, 1, -1}};
+  Ray cam = {{1, 1, 2}, {1, 1, -1}};
   Map_Rectangle rect = {{1, 1, 0}, 1, 1, 1};
   /*
-  crd* a = shoot_Rect(&rect, signt);
+  crd* a = shoot_Rect(&rect, cam);
    */
   Map map = {{1, &rect}};
   gir = initialize_window();
-  
+
   int wasdshsp[6] = {0, 0, 0, 0, 0, 0};
   int rot[4] = {0, 0, 0, 0};
-  
+
   while (gir) {
+    clock_t t0 = clock();
     render(cam, &map);
-    printf("%.1lf, %.1lf, %.1lf\n", cam.pos.x, cam.pos.y, cam.pos.z);
+    //printf("%.1lf, %.1lf, %.1lf | %.1lf, %.1lf, %.1lf\n", cam.pos.x, cam.pos.y, cam.pos.z, cam.dir.x, cam.dir.y, cam.dir.z);
 
     SDL_Event ev;
     while (SDL_PollEvent(&ev)) {
       switch (ev.type) {
         case SDL_KEYDOWN:
           switch (ev.key.keysym.sym) {
-            continue;
           }
         case SDL_KEYUP:
           switch (ev.key.keysym.sym) {
@@ -110,6 +110,14 @@ int main() {
       teorpos.y += rotateXY(cam.dir, pi / 2).y * movespeed;
     }
 
+    if (wasdshsp[4]) {
+      teorpos.z -= movespeed/2.0;
+    }
+
+    if (wasdshsp[5]) {
+      teorpos.z += movespeed/2.0;
+    }
+
     if (rot[0]) {
       cam.dir = rotateUP(cam.dir, rotatespeed);
     }
@@ -128,7 +136,9 @@ int main() {
 
     cam.pos = teorpos;
 
-    SDL_Delay(10);
+    clock_t t = clock();
+    f64 seconds = (f64)(t - t0) / CLOCKS_PER_SEC;
+    printf("%.15lf\n", 1.0 / seconds);
   }
   return 0;
 }
