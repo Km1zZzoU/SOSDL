@@ -3,6 +3,7 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 #include <math.h>
+#include "Lotion.h"
 #include "Math.h"
 #include "Definitions.h"
 

@@ -13,18 +13,22 @@
 #include <ctype.h>
 #include <unistd.h>
 
-double globl = 1.5;
 #include "Render.h"
 #include "Math.h"
 
 
 int main() {
-  Ray cam = {{1, -10, 13}, {0, 1, -1}};
-  Map_Rectangle rect = {{0, 1, 0}, 10, 10, 10};
-  /*
-  crd a = shoot_Rect(&rect, cam);
-   */
-  Map map = {{1, &rect}};
+  Ray cam = {{-1, -1, 2}, {1, 1, 0}};
+  u16 count = 3;
+  Map_Rectangle* rects = (Map_Rectangle*) malloc(count * sizeof (Map_Rectangle));
+  Map_Rectangle rect0 = {{0, 1, 0}, 3, 3, 3, {255, 50, 100}};
+  *rects = rect0;
+  Map_Rectangle rect1 = {{-100, -100, -1}, 200, 200, 1, {0, 255, 0}};
+  *(rects + 1) = rect1;
+  Map_Rectangle rect2 = {{0, 0, 0}, 1, 1, 1, {0, 0, 255}};
+  *(rects + 2) = rect2;
+
+  Map map = {{count, rects}};
   gir = initialize_window();
 
   int wasdshsp[6] = {0, 0, 0, 0, 0, 0};
@@ -33,7 +37,6 @@ int main() {
   while (gir) {
     clock_t t0 = clock();
     render(cam, &map);
-    //printf("%.1lf, %.1lf, %.1lf | %.1lf, %.1lf, %.1lf\n", cam.pos.x, cam.pos.y, cam.pos.z, cam.dir.x, cam.dir.y, cam.dir.z);
 
     SDL_Event ev;
     while (SDL_PollEvent(&ev)) {
@@ -127,7 +130,7 @@ int main() {
     }
 
     if (rot[0]) {
-      cam.dir = rotateUP(cam.dir, -rotatespeed);
+      cam.dir = rotateUP(cam.dir, rotatespeed);
     }
 
     if (rot[1]) {
@@ -135,7 +138,7 @@ int main() {
     }
 
     if (rot[2]) {
-      cam.dir = rotateUP(cam.dir, rotatespeed);
+      cam.dir = rotateUP(cam.dir, -rotatespeed);
     }
 
     if (rot[3]) {
@@ -146,7 +149,7 @@ int main() {
 
     clock_t t = clock();
     f64 seconds = (f64)(t - t0) / CLOCKS_PER_SEC;
-    printf(" %.2lf %.15lf\n", globl, 1.0 / seconds);
+    printf("%.15lf\n", 1.0 / seconds);
   }
   return 0;
 }

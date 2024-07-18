@@ -12,12 +12,17 @@ typedef float_t  f32;
 typedef double_t f64;
 
 typedef struct {
+  u8 r, g, b;
+} color;
+
+typedef struct {
   f64 x, y, z;
 } point;
 
 typedef struct {
   point p;
   f64   dist;
+  color col;
 } crd;
 
 typedef struct {
@@ -56,5 +61,6 @@ typedef struct {
 typedef struct {
   point_i pos;
   i32 x, y, z;
+  color col;
 } Map_Rectangle;
 

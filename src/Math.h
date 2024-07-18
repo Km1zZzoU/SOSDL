@@ -27,6 +27,11 @@ dist(point p1, point p2) {
 }
 
 v3
+sum(v3 v1, v3 v2) {
+  return (v3){v1.x + v2.x, v1.y + v2.y, v1.z + v2.z};
+}
+
+v3
 mul(v3 v, f64 cons) {
   v3 w = {v.x * cons, v.y * cons, v.z * cons};
   return w;
@@ -42,24 +47,27 @@ v3
 rotateXY(v3 v, f64 r) {
   v3 w = {v.x * cos(r) - v.y * sin(r),v.y * cos(r) + v.x * sin(r), v.z};
   return w;
-  return normalize(w);
+}
+
+f64
+projectionXY(v3 v) {
+  return sqrt(v.x * v.x + v.y * v.y);
 }
 
 v3
 rotateUP(v3 v, f64 r) {
-  f64 xy = sqrt(v.x * v.x + v.y * v.y);
-  f64 newxy = xy * cos(r) - v.z * sin(r);
-  f64 k = newxy / xy;
-  v3 w = {k * v.x, k * v.y, xy * sin(r) + v.z * cos(r)};
+  f64 poxy = projectionXY(v);
+  f64 newxy = poxy * cos(r) - v.z * sin(r);
+  f64 k = newxy / poxy;
+  v3 w = {k * v.x, k * v.y, poxy * sin(r) + v.z * cos(r)};
   return w;
-  return normalize(w);
 }
 
 void
-shoot_Side(crd* coord, int maincord,
-                int cord1, int cord2, int l1, int l2,
-                f64 dirx, f64 diry, f64 dirz,
-                f64 posx, f64 posy, f64 posz) {
+ShootSide(crd* coord, i32 maincord,
+          i32 cord1, i32 cord2, i32 l1, i32 l2,
+          f64 dirx, f64 diry, f64 dirz,
+          f64 posx, f64 posy, f64 posz) {
   if (!dirx)
     return;
 
@@ -93,13 +101,13 @@ near(crd coord, crd tmp) {
 }
 
 crd
-shoot_Rect(Map_Rectangle* rect, Ray ray) {
+ShootRect(Map_Rectangle* rect, Ray ray) {
 
-  crd coord = {{0, 0, 0}, 0};
-  crd tmp   = {{0, 0, 0}, 0};
+  crd coord = {{0, 0, 0}, 0, {0, 0, 0}};
+  crd tmp   = {{0, 0, 0}, 0, {0, 0, 0}};
 
   if ((ray.pos.x > rect->pos.x + rect->x) || (ray.pos.x < rect->pos.x)) {
-    shoot_Side(&tmp, rect->pos.x + rect->x * (ray.pos.x > rect->pos.x),
+    ShootSide(&tmp, rect->pos.x + rect->x * (ray.pos.x > rect->pos.x),
                rect->pos.y, rect->pos.z, rect->y, rect->z,
                ray.dir.x, ray.dir.y, ray.dir.z,
                ray.pos.x, ray.pos.y, ray.pos.z);
@@ -107,7 +115,7 @@ shoot_Rect(Map_Rectangle* rect, Ray ray) {
   }
 
   if ((ray.pos.y > rect->pos.y + rect->y) || (ray.pos.y < rect->pos.y)) {
-    shoot_Side(&tmp, rect->pos.y + rect->y * (ray.pos.y > rect->pos.y),
+    ShootSide(&tmp, rect->pos.y + rect->y * (ray.pos.y > rect->pos.y),
                rect->pos.x, rect->pos.z, rect->x, rect->z,
                ray.dir.y, ray.dir.x, ray.dir.z,
                ray.pos.y, ray.pos.x, ray.pos.z);
@@ -115,13 +123,14 @@ shoot_Rect(Map_Rectangle* rect, Ray ray) {
   }
 
   if ((ray.pos.z > rect->pos.z + rect->z) || (ray.pos.z < rect->pos.z)) {
-    shoot_Side(&tmp, rect->pos.z + rect->z * (ray.pos.z > rect->pos.z),
+    ShootSide(&tmp, rect->pos.z + rect->z * (ray.pos.z > rect->pos.z),
                rect->pos.y, rect->pos.x, rect->y, rect->x,
                ray.dir.z, ray.dir.y, ray.dir.x,
                ray.pos.z, ray.pos.y, ray.pos.x);
     coord = near(coord, tmp);
   }
-/*
-*/
+
+  coord.col = rect->col;
+
   return coord;
 }
